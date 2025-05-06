@@ -1,7 +1,10 @@
+"""Main app file"""
+
 import argparse
 import json
 import logging
 import os
+import sys
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
@@ -36,14 +39,13 @@ def categorize_certificates(certs_dir: str) -> List[Dict[str, Any]]:
                 expiration_date = get_certificate_expiration(cert_path)
                 expiration_str = expiration_date.isoformat()  # Convert to string
 
-                if expiration_date > current_date:
-                    status = "valid"
-                elif (
-                    expiration_date <= current_date and expiration_date > threshold_date
-                ):
-                    status = "expiring"
-                else:
-                    status = "expired"
+                status = (
+                    "valid"
+                    if expiration_date > current_date
+                    else "expiring"
+                    if expiration_date > threshold_date
+                    else "expired"
+                )
 
                 certificates.append(
                     {
@@ -52,14 +54,15 @@ def categorize_certificates(certs_dir: str) -> List[Dict[str, Any]]:
                         "status": status,
                     }
                 )
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         logger.error("Certs folder not found")
-        exit()
+        sys.exit()
 
     return certificates
 
 
 def cli() -> None:
+    """Main cli app to execute app"""
     # Set up argument parsing
     parser = argparse.ArgumentParser(description="List Let's Encrypt certificates.")
     parser.add_argument(
@@ -68,12 +71,8 @@ def cli() -> None:
         default="all",
         help="Specify the category of certificates to list (default: all)",
     )
-    parser.add_argument(
-        "--json", action="store_true", help="Output results in JSON format"
-    )
-    parser.add_argument(
-        "--certs-dir", type=str, help="Directory where certificates are stored"
-    )
+    parser.add_argument("--json", action="store_true", help="Output results in JSON format")
+    parser.add_argument("--certs-dir", type=str, help="Directory where certificates are stored")
 
     args = parser.parse_args()
 
@@ -84,9 +83,7 @@ def cli() -> None:
 
     # Filter certificates based on the specified category
     if args.category != "all":
-        certificates = [
-            cert for cert in certificates if cert["status"] == args.category
-        ]
+        certificates = [cert for cert in certificates if cert["status"] == args.category]
 
     # Print the results
     if args.json:
@@ -95,7 +92,8 @@ def cli() -> None:
         print("Certificates categorized by status:")
         for cert in certificates:
             print(
-                f"Domain: {cert['domain']}, Expiration Date: {cert['expiration_date']}, Status: {cert['status']}"
+                f"Domain: {cert['domain']}, Expiration Date: {cert['expiration_date']}"
+                f", Status: {cert['status']}"
             )
 
 

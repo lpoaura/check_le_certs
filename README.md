@@ -29,7 +29,7 @@ This project is configured with the following tools:
 - [Black](https://black.readthedocs.io/en/stable/) to format the code without any existential question
 - [iSort](https://pycqa.github.io/isort/) to sort the Python imports
 
-Code rules are enforced with [pre-commit](https://pre-commit.com/) hooks.  
+Code rules are enforced with [pre-commit](https://pre-commit.com/) hooks.
 Static code analisis is based on: both
 
 See also: [contribution guidelines](CONTRIBUTING.md).
