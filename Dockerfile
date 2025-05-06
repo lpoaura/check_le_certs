@@ -31,4 +31,6 @@ RUN pip install /tmp/*.whl
 
 USER appuser
 
+VOLUME ["/certs"]
+
 ENTRYPOINT ["check_certs"]
